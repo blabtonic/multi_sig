@@ -177,7 +177,7 @@ contract Wallet {
     returns (
       address to,
       uint256 amount,
-      bytes memory datra,
+      bytes memory data,
       bool executed,
       uint256 numConfirmations
     )

@@ -9,6 +9,7 @@ contract TestContract {
   }
 
   function getData() public pure returns (bytes memory) {
+    // Execute this to get data for SubmitTransaction
     return abi.encodeWithSignature("callMe(uint256)", 123);
   }
 }
