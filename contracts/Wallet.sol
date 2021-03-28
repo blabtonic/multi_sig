@@ -2,6 +2,7 @@
 pragma solidity >=0.4.22 <0.9.0;
 
 contract Wallet {
+  /** EVENT LIST **/
   event Deposit(address indexed sender, uint256 amount, uint256 balance);
   event SubmitTransaction(
     address indexed owner,
@@ -17,6 +18,7 @@ contract Wallet {
   // Always set an owner for contract
   address[] public owners;
   mapping(address => bool) isOwner;
+  uint256 public numConfirmationsRequired;
 
   // Number of confirmations needed for transaction to go through
   uint256 public Confirmations;
@@ -55,6 +57,8 @@ contract Wallet {
     _numConfirmationsRequired = _numConfirmationsRequired;
   }
 
+  /** MODIFIER LIST **/
+
   modifier onlyOwner() {
     require(isOwner[msg.sender], 'not owner');
     _;
@@ -62,6 +66,16 @@ contract Wallet {
 
   modifier notConfirmed(uint256 _txIndex) {
     require(!isConfirmed[_txIndex][msg.sender], 'transaction already confirmed');
+    _;
+  }
+
+  modifier txExists(uint256 _txIndex) {
+    require(_txIndex < transactions.length, 'transaction does not exist');
+    _;
+  }
+
+  modifier notExecuted(uint256 _txIndex) {
+    require(!transactions[_txIndex].executed, 'transaction already executed');
     _;
   }
 
@@ -86,10 +100,13 @@ contract Wallet {
     emit SubmitTransaction(msg.sender, _to, _amount, txIndex, _data);
   }
 
+  // Confirms transactions when value is entered
   function confirmTransaction(uint256 _txIndex)
     public
     onlyOwner
     notConfirmed(_txIndex)
+    txExists(_txIndex)
+    notExecuted(_txIndex)
   {
     Transaction storage transaction = transactions[_txIndex];
     transaction.numConfirmations += 1;
@@ -98,16 +115,43 @@ contract Wallet {
     emit ConfirmTransaction(msg.sender, _txIndex);
   }
 
-  function executeTransaction(uint256 _txIndex) public onlyOwner {
+  // Executes a new transaction
+  function executeTransaction(uint256 _txIndex)
+    public
+    onlyOwner
+    notConfirmed(_txIndex)
+    txExists(_txIndex)
+    notExecuted(_txIndex)
+  {
     Transaction storage transaction = transactions[_txIndex];
 
-    require(transaction.numConfirmations >= 1, 'cannot execute transaction');
+    require(
+      transaction.numConfirmations >= numConfirmationsRequired,
+      'cannot execute transaction'
+    );
+
+    transaction.executed = true;
+
+    // Mapping?
+    (bool success, ) = transaction.to.call{value: transaction.amount}(transaction.data);
+    require(success, 'transaction failed');
 
     emit ExecuteTransaction(msg.sender, _txIndex);
   }
 
-  function revokeConfirmation(uint256 _txIndex) public onlyOwner {
+  function revokeConfirmation(uint256 _txIndex)
+    public
+    onlyOwner
+    notConfirmed(_txIndex)
+    txExists(_txIndex)
+    notExecuted(_txIndex)
+  {
     Transaction storage transaction = transactions[_txIndex];
+
+    require(isConfirmed[_txIndex][msg.sender], 'transaction not confirmed');
+
+    transaction.numConfirmations -= 1;
+    isConfirmed[_txIndex][msg.sender] = false;
 
     emit RevokeConfirmation(msg.sender, _txIndex);
   }
