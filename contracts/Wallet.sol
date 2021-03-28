@@ -13,14 +13,14 @@ contract Wallet {
   event ConfirmTransaction(address indexed owner, uint256 indexed txIndex);
   event RevokeConfirmation(address indexed owner, uint256 indexed txIndex);
   event ExecuteTransaction(address indexed owner, uint256 indexed txIndex);
-  
+
   // Always set an owner for contract
   address[] public owners;
-  mapping (address => bool) isOwner;
-  
+  mapping(address => bool) isOwner;
+
   // Number of confirmations needed for transaction to go through
   uint256 public Confirmations;
-  
+
   struct Transaction {
     uint256 amount;
     address to;
@@ -33,43 +33,52 @@ contract Wallet {
   mapping(address => bool) public isConfirmed;
 
   Transaction[] public transactions;
-  
-  constructor(address[] memory _owners, uint256 _numConfirmationsRequired) public {
-    require(_owners.length > 0, "owners required");
+
+  constructor(address[] memory _owners, uint256 _numConfirmationsRequired)
+    public
+  {
+    require(_owners.length > 0, 'owners required');
     require(
-      _numConfirmationsRequired > 0 && _numConfirmationsRequired <= _owners.length, 
-      "invalid number of required confirmations"
+      _numConfirmationsRequired > 0 &&
+        _numConfirmationsRequired <= _owners.length,
+      'invalid number of required confirmations'
     );
 
     for (uint256 i = 0; i < _owners.length; i++) {
       address owner = _owners[i];
 
-      require(owner != address(0), "invalid owner");
+      require(owner != address(0), 'invalid owner');
       // Error check for unique owners to approve
-      require(!isOwner[owner], "owner not unique");
-      
+      require(!isOwner[owner], 'owner not unique');
+
       isOwner[owner] = true;
       owners.push(owner);
     }
-    
+
     _numConfirmationsRequired = _numConfirmationsRequired;
   }
 
   modifier onlyOwner() {
-    require(isOwner[msg.sender], "not owner");
+    require(isOwner[msg.sender], 'not owner');
     _;
   }
 
-  function submitTransaction(address _to, uint256 _amount, bytes memory _data) public onlyOwner {
+  function submitTransaction(
+    address _to,
+    uint256 _amount,
+    bytes memory _data
+  ) public onlyOwner {
     uint256 txIndex = transactions.length;
 
-    transactions.push(Transaction({
-      to: _to,
-      amount: _amount,
-      data: _data,
-      executed: false,
-      numConfirmations: 0
-    }));
+    transactions.push(
+      Transaction({
+        to: _to,
+        amount: _amount,
+        data: _data,
+        executed: false,
+        numConfirmations: 0
+      })
+    );
 
     emit SubmitTransaction(msg.sender, _to, _amount, txIndex, _data);
   }
