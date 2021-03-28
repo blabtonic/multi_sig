@@ -157,6 +157,12 @@ contract Wallet {
     emit RevokeConfirmation(msg.sender, _txIndex);
   }
 
+  // Where is this external from?
+  receive() payable external {
+    emit Deposit(msg.sender, msg.value, address(this).balance);
+  }
+
+  /** RETURN FUNCTIONS **/
   function getOwners() public view returns (address[] memory) {
     return owners;
   }
