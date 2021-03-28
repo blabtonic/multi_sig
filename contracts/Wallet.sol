@@ -30,7 +30,7 @@ contract Wallet {
   }
 
   // Tx index => owner => bool
-  mapping(address => bool) public isConfirmed;
+  mapping(uint256 => mapping(address => bool)) public isConfirmed;
 
   Transaction[] public transactions;
 
@@ -63,6 +63,12 @@ contract Wallet {
     _;
   }
 
+  modifier notConfirmed(uint256 _txIndex) {
+    require(!isConfirmed[_txIndex][msg.sender], 'transaction already confirmed');
+    _;
+  }
+
+  // Submits Transcation only after it has been confirmed
   function submitTransaction(
     address _to,
     uint256 _amount,
