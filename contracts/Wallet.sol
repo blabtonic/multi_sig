@@ -34,13 +34,10 @@ contract Wallet {
 
   Transaction[] public transactions;
 
-  constructor(address[] memory _owners, uint256 _numConfirmationsRequired)
-    public
-  {
+  constructor(address[] memory _owners, uint256 _numConfirmationsRequired) {
     require(_owners.length > 0, 'owners required');
     require(
-      _numConfirmationsRequired > 0 &&
-        _numConfirmationsRequired <= _owners.length,
+      _numConfirmationsRequired > 0 && _numConfirmationsRequired <= _owners.length,
       'invalid number of required confirmations'
     );
 
@@ -89,9 +86,29 @@ contract Wallet {
     emit SubmitTransaction(msg.sender, _to, _amount, txIndex, _data);
   }
 
-  function confirmTransaction() public {}
+  function confirmTransaction(uint256 _txIndex)
+    public
+    onlyOwner
+    notConfirmed(_txIndex)
+  {
+    Transaction storage transaction = transactions[_txIndex];
+    transaction.numConfirmations += 1;
+    isConfirmed[_txIndex][msg.sender] = true;
 
-  function executeTransaction() public {}
+    emit ConfirmTransaction(msg.sender, _txIndex);
+  }
 
-  function revokeConfirmation() public {}
+  function executeTransaction(uint256 _txIndex) public onlyOwner {
+    Transaction storage transaction = transactions[_txIndex];
+
+    require(transaction.numConfirmations >= 1, 'cannot execute transaction');
+
+    emit ExecuteTransaction(msg.sender, _txIndex);
+  }
+
+  function revokeConfirmation(uint256 _txIndex) public onlyOwner {
+    Transaction storage transaction = transactions[_txIndex];
+
+    emit RevokeConfirmation(msg.sender, _txIndex);
+  }
 }
