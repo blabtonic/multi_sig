@@ -133,7 +133,8 @@ contract Wallet {
     transaction.executed = true;
 
     // Mapping?
-    (bool success, ) = transaction.to.call{value: transaction.amount}(transaction.data);
+    (bool success, ) =
+      transaction.to.call{value: transaction.amount}(transaction.data);
     require(success, 'transaction failed');
 
     emit ExecuteTransaction(msg.sender, _txIndex);
@@ -154,5 +155,35 @@ contract Wallet {
     isConfirmed[_txIndex][msg.sender] = false;
 
     emit RevokeConfirmation(msg.sender, _txIndex);
+  }
+
+  function getOwners() public view returns (address[] memory) {
+    return owners;
+  }
+
+  function getTransactionCount() public view returns (uint256) {
+    return transactions.length;
+  }
+
+  function getTransaction(uint256 _txIndex)
+    public
+    view
+    returns (
+      address to,
+      uint256 amount,
+      bytes memory datra,
+      bool executed,
+      uint256 numConfirmations
+    )
+  {
+    Transaction storage transaction = transactions[_txIndex];
+
+    return (
+      transaction.to,
+      transaction.amount,
+      transaction.data,
+      transaction.executed,
+      transaction.numConfirmations
+    );
   }
 }
