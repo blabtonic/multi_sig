@@ -158,7 +158,7 @@ contract Wallet {
   }
 
   // Where is this external from?
-  receive() payable external {
+  receive() external payable {
     emit Deposit(msg.sender, msg.value, address(this).balance);
   }
 
