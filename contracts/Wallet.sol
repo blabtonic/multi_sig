@@ -1,6 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.4.22 <0.9.0;
 
+/**
+ *
+ *@title Wallet
+ * Multi-sig wallet that has multiple owners
+ *@author Trystan Hendricks - <greatmst3k@fastmail.com>
+ */
 contract Wallet {
   /** EVENT LIST **/
   event Deposit(address indexed sender, uint256 amount, uint256 balance);

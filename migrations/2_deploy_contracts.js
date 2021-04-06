@@ -3,8 +3,8 @@ const TestContract = artifacts.require("TestContract");
 
 // Remix says that address needs to be an array
 /**
- * ["0x78731D3Ca6b7E34aC0F824c42a7cC18A495cabaB",
- * "0xdD870fA1b7C4700F2BD7f44238821C26f7392148"],"1"
+ * ["0x7873...",
+ * "0xdD87..."],"1"
  * Multiple addresses needed for confirmation
  * */
 module.exports = function (deployer) {
