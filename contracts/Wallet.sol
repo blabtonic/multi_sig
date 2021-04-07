@@ -8,19 +8,7 @@ pragma solidity >=0.4.22 <0.9.0;
  * @author Trystan Hendricks - <greatmst3k@fastmail.com>
  */
 contract Wallet {
-  /** EVENT LIST **/
-  event Deposit(address indexed sender, uint256 amount, uint256 balance);
-  event SubmitTransaction(
-    address indexed owner,
-    address indexed to,
-    uint256 amount,
-    uint256 indexed txIndex,
-    bytes data
-  );
-  event ConfirmTransaction(address indexed owner, uint256 indexed txIndex);
-  event RevokeConfirmation(address indexed owner, uint256 indexed txIndex);
-  event ExecuteTransaction(address indexed owner, uint256 indexed txIndex);
-
+  
   // Always set an owner for contract
   address[] public owners;
   mapping(address => bool) isOwner;
@@ -41,6 +29,22 @@ contract Wallet {
   mapping(uint256 => mapping(address => bool)) public isConfirmed;
 
   Transaction[] public transactions;
+  
+  // *************** Events *************************** //
+  
+  event Deposit(address indexed sender, uint256 amount, uint256 balance);
+  event SubmitTransaction(
+    address indexed owner,
+    address indexed to,
+    uint256 amount,
+    uint256 indexed txIndex,
+    bytes data
+  );
+  event ConfirmTransaction(address indexed owner, uint256 indexed txIndex);
+  event RevokeConfirmation(address indexed owner, uint256 indexed txIndex);
+  event ExecuteTransaction(address indexed owner, uint256 indexed txIndex);
+  
+  // *************** Constructor ********************** //
 
   constructor(address[] memory _owners, uint256 _numConfirmationsRequired) {
     require(_owners.length > 0, 'owners required');
@@ -63,8 +67,8 @@ contract Wallet {
     _numConfirmationsRequired = _numConfirmationsRequired;
   }
 
-  /** MODIFIER LIST **/
-
+  // *************** Modifier ********************** //
+  
   modifier onlyOwner() {
     require(isOwner[msg.sender], 'not owner');
     _;
@@ -167,8 +171,9 @@ contract Wallet {
   receive() external payable {
     emit Deposit(msg.sender, msg.value, address(this).balance);
   }
-
-  /** RETURN FUNCTIONS **/
+  
+  // *************** Return Functions ********************** //
+  
   function getOwners() public view returns (address[] memory) {
     return owners;
   }
