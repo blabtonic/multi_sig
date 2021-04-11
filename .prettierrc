@@ -10,6 +10,21 @@
         "bracketSpacing": false,
         "explicitTypes": "always"
       }
+    },
+    {
+      "files": "*.js",
+      "options": {
+        "htmlWhitespaceSensitivity": "css",
+        "insertPragma": false,
+        "jsxBracketSameLine": false,
+        "jsxSingleQuote": false,
+        "printWidth": 80,
+        "requirePragma": false,
+        "semi": true,
+        "singleQuote": true,
+        "tabWidth": 2,
+        "useTabs": false
+      }
     }
   ]
 }

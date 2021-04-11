@@ -3,6 +3,8 @@
     "@truffle/hdwallet-provider": "^1.2.4"
   },
   "devDependencies": {
+    "chai": "^4.3.4",
+    "chai-as-promised": "^7.1.1",
     "prettier": "^2.2.1",
     "prettier-plugin-solidity": "^1.0.0-beta.6"
   }
